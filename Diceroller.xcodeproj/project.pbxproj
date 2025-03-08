@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		1ACF8E472D7CDD5600626E97 /* Diceroller Watch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 1ACF8E242D7CDD5500626E97 /* Diceroller Watch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		1ACF8E012D7C870700626E97 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -21,12 +25,50 @@
 			remoteGlobalIDString = 1ACF8DEF2D7C870500626E97;
 			remoteInfo = Diceroller;
 		};
+		1ACF8E342D7CDD5600626E97 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1ACF8DE82D7C870500626E97 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1ACF8E232D7CDD5500626E97;
+			remoteInfo = "Diceroller Watch Watch App";
+		};
+		1ACF8E3E2D7CDD5600626E97 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1ACF8DE82D7C870500626E97 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1ACF8E232D7CDD5500626E97;
+			remoteInfo = "Diceroller Watch Watch App";
+		};
+		1ACF8E452D7CDD5600626E97 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1ACF8DE82D7C870500626E97 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1ACF8E232D7CDD5500626E97;
+			remoteInfo = "Diceroller Watch Watch App";
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1ACF8E4B2D7CDD5600626E97 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				1ACF8E472D7CDD5600626E97 /* Diceroller Watch Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		1ACF8DF02D7C870500626E97 /* Diceroller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Diceroller.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1ACF8E002D7C870700626E97 /* DicerollerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DicerollerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1ACF8E0A2D7C870700626E97 /* DicerollerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DicerollerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1ACF8E242D7CDD5500626E97 /* Diceroller Watch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Diceroller Watch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1ACF8E332D7CDD5600626E97 /* Diceroller Watch Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Diceroller Watch Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1ACF8E3D2D7CDD5600626E97 /* Diceroller Watch Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Diceroller Watch Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -43,6 +85,21 @@
 		1ACF8E0D2D7C870700626E97 /* DicerollerUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = DicerollerUITests;
+			sourceTree = "<group>";
+		};
+		1ACF8E252D7CDD5500626E97 /* Diceroller Watch Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Diceroller Watch Watch App";
+			sourceTree = "<group>";
+		};
+		1ACF8E362D7CDD5600626E97 /* Diceroller Watch Watch AppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Diceroller Watch Watch AppTests";
+			sourceTree = "<group>";
+		};
+		1ACF8E402D7CDD5600626E97 /* Diceroller Watch Watch AppUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Diceroller Watch Watch AppUITests";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -69,6 +126,27 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		1ACF8E212D7CDD5500626E97 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1ACF8E302D7CDD5600626E97 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1ACF8E3A2D7CDD5600626E97 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -78,6 +156,9 @@
 				1ACF8DF22D7C870500626E97 /* Diceroller */,
 				1ACF8E032D7C870700626E97 /* DicerollerTests */,
 				1ACF8E0D2D7C870700626E97 /* DicerollerUITests */,
+				1ACF8E252D7CDD5500626E97 /* Diceroller Watch Watch App */,
+				1ACF8E362D7CDD5600626E97 /* Diceroller Watch Watch AppTests */,
+				1ACF8E402D7CDD5600626E97 /* Diceroller Watch Watch AppUITests */,
 				1ACF8DF12D7C870500626E97 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -88,6 +169,9 @@
 				1ACF8DF02D7C870500626E97 /* Diceroller.app */,
 				1ACF8E002D7C870700626E97 /* DicerollerTests.xctest */,
 				1ACF8E0A2D7C870700626E97 /* DicerollerUITests.xctest */,
+				1ACF8E242D7CDD5500626E97 /* Diceroller Watch Watch App.app */,
+				1ACF8E332D7CDD5600626E97 /* Diceroller Watch Watch AppTests.xctest */,
+				1ACF8E3D2D7CDD5600626E97 /* Diceroller Watch Watch AppUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -102,10 +186,12 @@
 				1ACF8DEC2D7C870500626E97 /* Sources */,
 				1ACF8DED2D7C870500626E97 /* Frameworks */,
 				1ACF8DEE2D7C870500626E97 /* Resources */,
+				1ACF8E4B2D7CDD5600626E97 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				1ACF8E462D7CDD5600626E97 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				1ACF8DF22D7C870500626E97 /* Diceroller */,
@@ -163,6 +249,74 @@
 			productReference = 1ACF8E0A2D7C870700626E97 /* DicerollerUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		1ACF8E232D7CDD5500626E97 /* Diceroller Watch Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1ACF8E482D7CDD5600626E97 /* Build configuration list for PBXNativeTarget "Diceroller Watch Watch App" */;
+			buildPhases = (
+				1ACF8E202D7CDD5500626E97 /* Sources */,
+				1ACF8E212D7CDD5500626E97 /* Frameworks */,
+				1ACF8E222D7CDD5500626E97 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				1ACF8E252D7CDD5500626E97 /* Diceroller Watch Watch App */,
+			);
+			name = "Diceroller Watch Watch App";
+			packageProductDependencies = (
+			);
+			productName = "Diceroller Watch Watch App";
+			productReference = 1ACF8E242D7CDD5500626E97 /* Diceroller Watch Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
+		1ACF8E322D7CDD5600626E97 /* Diceroller Watch Watch AppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1ACF8E4C2D7CDD5600626E97 /* Build configuration list for PBXNativeTarget "Diceroller Watch Watch AppTests" */;
+			buildPhases = (
+				1ACF8E2F2D7CDD5600626E97 /* Sources */,
+				1ACF8E302D7CDD5600626E97 /* Frameworks */,
+				1ACF8E312D7CDD5600626E97 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1ACF8E352D7CDD5600626E97 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				1ACF8E362D7CDD5600626E97 /* Diceroller Watch Watch AppTests */,
+			);
+			name = "Diceroller Watch Watch AppTests";
+			packageProductDependencies = (
+			);
+			productName = "Diceroller Watch Watch AppTests";
+			productReference = 1ACF8E332D7CDD5600626E97 /* Diceroller Watch Watch AppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		1ACF8E3C2D7CDD5600626E97 /* Diceroller Watch Watch AppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1ACF8E4F2D7CDD5600626E97 /* Build configuration list for PBXNativeTarget "Diceroller Watch Watch AppUITests" */;
+			buildPhases = (
+				1ACF8E392D7CDD5600626E97 /* Sources */,
+				1ACF8E3A2D7CDD5600626E97 /* Frameworks */,
+				1ACF8E3B2D7CDD5600626E97 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1ACF8E3F2D7CDD5600626E97 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				1ACF8E402D7CDD5600626E97 /* Diceroller Watch Watch AppUITests */,
+			);
+			name = "Diceroller Watch Watch AppUITests";
+			packageProductDependencies = (
+			);
+			productName = "Diceroller Watch Watch AppUITests";
+			productReference = 1ACF8E3D2D7CDD5600626E97 /* Diceroller Watch Watch AppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -184,6 +338,17 @@
 						CreatedOnToolsVersion = 16.2;
 						TestTargetID = 1ACF8DEF2D7C870500626E97;
 					};
+					1ACF8E232D7CDD5500626E97 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					1ACF8E322D7CDD5600626E97 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 1ACF8E232D7CDD5500626E97;
+					};
+					1ACF8E3C2D7CDD5600626E97 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 1ACF8E232D7CDD5500626E97;
+					};
 				};
 			};
 			buildConfigurationList = 1ACF8DEB2D7C870500626E97 /* Build configuration list for PBXProject "Diceroller" */;
@@ -203,6 +368,9 @@
 				1ACF8DEF2D7C870500626E97 /* Diceroller */,
 				1ACF8DFF2D7C870700626E97 /* DicerollerTests */,
 				1ACF8E092D7C870700626E97 /* DicerollerUITests */,
+				1ACF8E232D7CDD5500626E97 /* Diceroller Watch Watch App */,
+				1ACF8E322D7CDD5600626E97 /* Diceroller Watch Watch AppTests */,
+				1ACF8E3C2D7CDD5600626E97 /* Diceroller Watch Watch AppUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -223,6 +391,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		1ACF8E082D7C870700626E97 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1ACF8E222D7CDD5500626E97 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1ACF8E312D7CDD5600626E97 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1ACF8E3B2D7CDD5600626E97 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -253,6 +442,27 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		1ACF8E202D7CDD5500626E97 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1ACF8E2F2D7CDD5600626E97 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1ACF8E392D7CDD5600626E97 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -265,6 +475,21 @@
 			isa = PBXTargetDependency;
 			target = 1ACF8DEF2D7C870500626E97 /* Diceroller */;
 			targetProxy = 1ACF8E0B2D7C870700626E97 /* PBXContainerItemProxy */;
+		};
+		1ACF8E352D7CDD5600626E97 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1ACF8E232D7CDD5500626E97 /* Diceroller Watch Watch App */;
+			targetProxy = 1ACF8E342D7CDD5600626E97 /* PBXContainerItemProxy */;
+		};
+		1ACF8E3F2D7CDD5600626E97 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1ACF8E232D7CDD5500626E97 /* Diceroller Watch Watch App */;
+			targetProxy = 1ACF8E3E2D7CDD5600626E97 /* PBXContainerItemProxy */;
+		};
+		1ACF8E462D7CDD5600626E97 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1ACF8E232D7CDD5500626E97 /* Diceroller Watch Watch App */;
+			targetProxy = 1ACF8E452D7CDD5600626E97 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -518,6 +743,144 @@
 			};
 			name = Release;
 		};
+		1ACF8E492D7CDD5600626E97 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Diceroller Watch Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = 89PR9JS5JX;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Diceroller Watch";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.jamesmcdonald.Diceroller;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jamesmcdonald.Diceroller.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Debug;
+		};
+		1ACF8E4A2D7CDD5600626E97 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Diceroller Watch Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = 89PR9JS5JX;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Diceroller Watch";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.jamesmcdonald.Diceroller;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jamesmcdonald.Diceroller.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Release;
+		};
+		1ACF8E4D2D7CDD5600626E97 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 89PR9JS5JX;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.jamesmcdonald.Diceroller-Watch-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Diceroller Watch Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Diceroller Watch Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Debug;
+		};
+		1ACF8E4E2D7CDD5600626E97 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 89PR9JS5JX;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.jamesmcdonald.Diceroller-Watch-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Diceroller Watch Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Diceroller Watch Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Release;
+		};
+		1ACF8E502D7CDD5600626E97 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 89PR9JS5JX;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.jamesmcdonald.Diceroller-Watch-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "Diceroller Watch Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Debug;
+		};
+		1ACF8E512D7CDD5600626E97 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 89PR9JS5JX;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.jamesmcdonald.Diceroller-Watch-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "Diceroller Watch Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -553,6 +916,33 @@
 			buildConfigurations = (
 				1ACF8E1B2D7C870700626E97 /* Debug */,
 				1ACF8E1C2D7C870700626E97 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1ACF8E482D7CDD5600626E97 /* Build configuration list for PBXNativeTarget "Diceroller Watch Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1ACF8E492D7CDD5600626E97 /* Debug */,
+				1ACF8E4A2D7CDD5600626E97 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1ACF8E4C2D7CDD5600626E97 /* Build configuration list for PBXNativeTarget "Diceroller Watch Watch AppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1ACF8E4D2D7CDD5600626E97 /* Debug */,
+				1ACF8E4E2D7CDD5600626E97 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1ACF8E4F2D7CDD5600626E97 /* Build configuration list for PBXNativeTarget "Diceroller Watch Watch AppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1ACF8E502D7CDD5600626E97 /* Debug */,
+				1ACF8E512D7CDD5600626E97 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
