@@ -9,7 +9,7 @@ import SwiftUI
 
 struct WatchDiceRollerView: View {
     @State private var numberOfDice: Int = 1
-    @State private var selectedDie: Int = 6
+    @State private var selectedDie: DieType = DieType.defaultDie
     @State private var modifier: Int = 0
     @State private var result: Int = 0
     @State private var showingConfigSheet: Bool = false
@@ -23,12 +23,12 @@ struct WatchDiceRollerView: View {
     var body: some View {
         VStack {
             HStack {
-                Button("\(numberOfDice)D\(selectedDie)\(modifierText)") {
+                Button("\(numberOfDice)\(selectedDie.description)\(modifierText)") {
                     showingConfigSheet = true
                 }
                 
                 Button("🎲") {
-                    result = (1...numberOfDice).map { _ in Int.random(in: 1...selectedDie) }.reduce(0, +) + modifier
+                    result = (1...numberOfDice).map { _ in Int.random(in: 1...selectedDie.rawValue) }.reduce(0, +) + modifier
                     WKInterfaceDevice.current().play(.success)
                 }
             }
@@ -59,7 +59,6 @@ struct WatchDiceRollerView: View {
                 numberOfDice: $numberOfDice,
                 selectedDie: $selectedDie,
                 modifier: $modifier,
-                diceOptions: diceOptions,
                 dismiss: { showingConfigSheet = false }
             )
         }
@@ -68,9 +67,8 @@ struct WatchDiceRollerView: View {
 
 struct DiceConfigView: View {
     @Binding var numberOfDice: Int
-    @Binding var selectedDie: Int
+    @Binding var selectedDie: DieType
     @Binding var modifier: Int
-    let diceOptions: [Int]
     let dismiss: () -> Void
 
     @State private var showingDicePicker = false
@@ -90,9 +88,10 @@ struct DiceConfigView: View {
             .sheet(isPresented: $showingDicePicker) {
                 SelectionView(
                     title: "Select Number of Dice",
-                    options: Array(1...10).map { "\($0)" },
-                    selected: "\(numberOfDice)",
-                    onSelect: { numberOfDice = Int($0) ?? 1 }
+                    options: Array(1...10),
+                    selected: $numberOfDice,
+                    format: { "\($0)"},
+                    dismiss: { showingDicePicker = false }
                 )
             }
 
@@ -101,15 +100,16 @@ struct DiceConfigView: View {
                 HStack {
                     Text("Die Type")
                     Spacer()
-                    Text("D\(selectedDie)").foregroundColor(.gray)
+                    Text("\(selectedDie.description)").foregroundColor(.gray)
                 }
             }
             .sheet(isPresented: $showingDiePicker) {
                 SelectionView(
                     title: "Select Die Type",
-                    options: diceOptions.map { "D\($0)" },
-                    selected: "D\(selectedDie)",
-                    onSelect: { selectedDie = Int($0.dropFirst()) ?? 6 }
+                    options: DieType.allCases,
+                    selected: $selectedDie,
+                    format: { "\($0.description)" },
+                    dismiss: { showingDiePicker = false }
                 )
             }
 
@@ -124,9 +124,10 @@ struct DiceConfigView: View {
             .sheet(isPresented: $showingModifierPicker) {
                 SelectionView(
                     title: "Select Modifier",
-                    options: Array(-10...10).map { "\($0 >= 0 ? "+" : "")\($0)" },
-                    selected: "\(modifier >= 0 ? "+" : "")\(modifier)",
-                    onSelect: { modifier = Int($0) ?? 0 }
+                    options: Array(-10...10),
+                    selected: $modifier,
+                    format: { "\($0 >= 0 ? "+" : "")\($0)" },
+                    dismiss: { showingModifierPicker = false }
                 )
             }
 
@@ -137,23 +138,23 @@ struct DiceConfigView: View {
 }
 
 // 🔥 Reusable Selection Sheet
-struct SelectionView: View {
+struct SelectionView<T: Hashable>: View {
     let title: String
-    let options: [String]
-    let selected: String
-    var onSelect: (String) -> Void
-    @Environment(\.dismiss) private var dismiss
+    let options: [T]
+    @Binding var selected: T
+    let format: (T) -> String
+    let dismiss: () -> Void
 
     var body: some View {
         List {
             Text(title).font(.headline)
             ForEach(options, id: \.self) { option in
                 Button(action: {
-                    onSelect(option)
+                    selected = option
                     dismiss()
                 }) {
                     HStack {
-                        Text(option)
+                        Text(format(option))
                         Spacer()
                         if option == selected { Image(systemName: "checkmark") }
                     }

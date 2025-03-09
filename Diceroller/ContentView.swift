@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var numberOfDice: Int = 1;
-    @State private var dieSelector: Int = 1;
+    @State private var dieSelector: DieType = .d20;
     @State private var modifier: Int = 0;
     @State private var rolls: [Int] = [];
     @State private var result: Int = 0;
@@ -19,7 +19,6 @@ struct ContentView: View {
     @State private var showingRollCollection: Bool = false;
     @State private var showingSaveAlert = false
     
-    let dice: [Int] = [4,6,8,10,12,20,100];
     let taglines: [String] = [
         "It's dicy",
         "Now with 50% more random",
@@ -51,14 +50,14 @@ struct ContentView: View {
             return []
         }
         for _ in 0..<Int(numberOfDice) {
-            result.append(Int.random(in: 1...dice[dieSelector]))
+            result.append(Int.random(in: 1...dieSelector.rawValue))
         }
         return result
     }
     
     func reset() {
         numberOfDice = 1
-        dieSelector = 1
+        dieSelector = .d20
         modifier = 0
         result = 0
         rolls.removeAll()
@@ -91,7 +90,7 @@ struct ContentView: View {
         savedConfigs[newConfigName] = RollConfig(
             name: newConfigName,
             numberOfDice: numberOfDice,
-            dieType: dice[dieSelector],
+            dieType: dieSelector,
             modifier: modifier
         )
         
@@ -120,10 +119,10 @@ struct ContentView: View {
                 }
             Form {
                 Section{
-                    Stepper("\(numberOfDice)D\(dice[dieSelector])", value: $numberOfDice, in: 1...50)
+                    Stepper("\(numberOfDice)\(dieSelector.description)", value: $numberOfDice, in: 1...50)
                     Picker("Select a number", selection: $dieSelector) {
-                        ForEach(dice.indices, id: \.self) { index in
-                            Text("D\(dice[index])").tag(index)
+                        ForEach(DieType.allCases, id: \.self) { die in
+                            Text("\(die.description)").tag(die)
                         }
                     }
                     .pickerStyle(SegmentedPickerStyle()) // Options: `MenuPickerStyle`, `SegmentedPickerStyle`, `WheelPickerStyle`
@@ -139,17 +138,17 @@ struct ContentView: View {
             }
             .frame(maxHeight: 220)
 
-            Button("Roll", systemImage: "dice") {
+            Button("Roll \(numberOfDice)\(dieSelector.description)\(modifierText)", systemImage: "dice") {
                 rolls = rollDice()
                 result = rolls.map(\.self).reduce(0, +) + modifier
-                print("Roll \(numberOfDice) D\(dice[dieSelector]) + \(modifier) = \(result)")
+                print("Roll \(numberOfDice) D\(dieSelector) + \(modifier) = \(result)")
                 
                 if rolls.count > 10 {
                     let firstFew = rolls.prefix(5).map(\.description).joined(separator: " + ")
                     let lastFew = rolls.suffix(2).map((\.description)).joined(separator: " + ")
-                    rollsText = "\(numberOfDice)D\(dice[dieSelector]) [\(firstFew) ... \(lastFew)] \(modifierText)"
+                    rollsText = "\(numberOfDice)D\(dieSelector) [\(firstFew) ... \(lastFew)] \(modifierText)"
                 } else {
-                    rollsText = "\(numberOfDice)D\(dice[dieSelector]) [" +
+                    rollsText = "\(numberOfDice)D\(dieSelector) [" +
                     rolls.map(\.description).joined(separator: " + ")
                     + "]" + modifierText
                 }
@@ -176,7 +175,7 @@ struct ContentView: View {
                             Button(name) {
                                 if let config = savedConfigs[name] {
                                     numberOfDice = config.numberOfDice
-                                    dieSelector = dice.firstIndex(of: config.dieType) ?? 1
+                                    dieSelector = config.dieType
                                     modifier = config.modifier
                                 }
                                 showingRollCollection = false

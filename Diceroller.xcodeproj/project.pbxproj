@@ -71,22 +71,9 @@
 		1ACF8E3D2D7CDD5600626E97 /* Diceroller Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Diceroller Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		1A9EA9CF2D7CF55800797CC8 /* Exceptions for "Shared" folder in "Diceroller Watch App" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				RollConfig.swift,
-			);
-			target = 1ACF8E232D7CDD5500626E97 /* Diceroller Watch App */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		1A9EA9C92D7CF51800797CC8 /* Shared */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				1A9EA9CF2D7CF55800797CC8 /* Exceptions for "Shared" folder in "Diceroller Watch App" target */,
-			);
 			path = Shared;
 			sourceTree = "<group>";
 		};
@@ -282,6 +269,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				1A9EA9C92D7CF51800797CC8 /* Shared */,
 				1ACF8E252D7CDD5500626E97 /* Diceroller Watch App */,
 			);
 			name = "Diceroller Watch App";
