@@ -22,19 +22,21 @@ struct WatchDiceRollerView: View {
     }
     var body: some View {
         VStack {
-            Button("🎲\(numberOfDice)D\(selectedDie)\(modifierText)") {
-                showingConfigSheet = true
+            HStack {
+                Button("\(numberOfDice)D\(selectedDie)\(modifierText)") {
+                    showingConfigSheet = true
+                }
+                
+                Button("🎲") {
+                    result = (1...numberOfDice).map { _ in Int.random(in: 1...selectedDie) }.reduce(0, +) + modifier
+                    WKInterfaceDevice.current().play(.success)
+                }
             }
-
-            Button("Roll") {
-                result = (1...numberOfDice).map { _ in Int.random(in: 1...selectedDie) }.reduce(0, +) + modifier
-                WKInterfaceDevice.current().play(.success)
+            Button("Saved") {
+                showingSavedRolls = true
             }
             .padding()
             
-            Button("📚") {
-                showingSavedRolls = true
-            }
             .sheet(isPresented: $showingSavedRolls) {
                 List(WatchSyncManager.shared.savedConfigs.keys.sorted(), id: \.self) { name in
                     Button(name) {
@@ -51,7 +53,6 @@ struct WatchDiceRollerView: View {
 
             Text("Result: \(result)")
             .font(.title)
-                .padding()
         }
         .sheet(isPresented: $showingConfigSheet) {
             DiceConfigView(
