@@ -7,13 +7,6 @@
 
 import SwiftUI
 
-struct RollConfig : Codable {
-    var name: String;
-    var numberOfDice: Int;
-    var dieType: Int;
-    var modifier: Int;
-}
-
 struct ContentView: View {
     @State private var numberOfDice: Int = 1;
     @State private var dieSelector: Int = 1;
@@ -82,6 +75,7 @@ struct ContentView: View {
         if let encoded = try? JSONEncoder().encode(savedConfigs) {
             UserDefaults.standard.set(encoded, forKey: "savedConfigs")
         }
+        WatchSyncManager.shared.syncSavedRolls(savedConfigs)
     }
 
     func loadConfigs() {

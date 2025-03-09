@@ -9,9 +9,13 @@ import SwiftUI
 
 @main
 struct Diceroller_Watch_Watch_AppApp: App {
+    init() {
+        _ = WatchSyncManager.shared
+    }
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            WatchDiceRollerView()
         }
     }
 }
