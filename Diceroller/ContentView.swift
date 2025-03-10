@@ -8,19 +8,27 @@
 import SwiftUI
 
 struct ContentView: View {
+    // Main form state
+    @State private var taglineIndex: Int = 0
+    
     @State private var numberOfDice: Int = 1;
     @State private var dieType: DieType = DieType.defaultDie;
     @State private var modifier: Int = 0;
     
-    @State private var rolls: [Int] = [];
     @State private var result: Int = 0;
     @State private var rollsText: String = "";
+    
+    // Save form state
     @State private var newConfigName = ""
 
+    // Configs form state
+    @State private var savedConfigs: [String: RollConfig] = [:]
+
+    // Form toggles
     @State private var showingRollCollection: Bool = false;
     @State private var showingSaveAlert = false
     
-    let taglines: [String] = [
+    private let taglines: [String] = [
         "It's dicy",
         "Now with 50% more random",
         "Rolling responsibly since 2025",
@@ -34,7 +42,6 @@ struct ContentView: View {
         "Roll high, live large",
         "Only a 1 in 20 chance of critical miss!"
     ]
-    @State private var savedConfigs: [String: RollConfig] = [:]
     
     var modifierText: String {
         if modifier == 0 {
@@ -43,14 +50,11 @@ struct ContentView: View {
         return modifier > 0 ? " + \(modifier)" : " - \(abs(modifier))"
     }
     
-    @State private var taglineIndex: Int = 0
-    
     func reset() {
         numberOfDice = 1
         dieType = DieType.defaultDie
         modifier = 0
         result = 0
-        rolls.removeAll()
         rollsText = ""
     }
     
@@ -122,13 +126,14 @@ struct ContentView: View {
                     HStack {
                         Text("Modifier:")
                         Spacer()
-                        Stepper("\(modifier >= 0 ? "+" : "")\(modifier)", value: $modifier)
+                        Stepper("\(modifier > 0 ? "+" : "")\(modifier)", value: $modifier)
                     }
                 }
             }
             .frame(maxHeight: 220)
 
             Button("Roll \(numberOfDice)\(dieType.description)\(modifierText)", systemImage: "dice") {
+                var rolls: [Int]
                 (result, rolls) = RollConfig(
                     name: "",
                     numberOfDice: numberOfDice,
@@ -148,7 +153,7 @@ struct ContentView: View {
             .buttonStyle(.borderedProminent)
             .padding()
             
-            Text("\(rolls.isEmpty ? "" : "\(result)")")
+            Text("\(result == 0 ? "" : "\(result)")")
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .padding()
