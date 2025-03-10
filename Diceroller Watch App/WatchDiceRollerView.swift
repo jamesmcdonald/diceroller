@@ -15,8 +15,6 @@ struct WatchDiceRollerView: View {
     @State private var showingConfigSheet: Bool = false
     @State private var showingSavedRolls: Bool = false
 
-    let diceOptions = [4, 6, 8, 10, 12, 20, 100]
-
     var modifierText: String {
         modifier == 0 ? "" : (modifier > 0 ? "+" : "") + "\(modifier)"
     }
@@ -28,7 +26,7 @@ struct WatchDiceRollerView: View {
                 }
                 
                 Button("🎲") {
-                    result = (1...numberOfDice).map { _ in Int.random(in: 1...selectedDie.rawValue) }.reduce(0, +) + modifier
+                    (result, _) = RollConfig(name: "Default", numberOfDice: numberOfDice, dieType: selectedDie, modifier: modifier).roll()
                     WKInterfaceDevice.current().play(.success)
                 }
             }
@@ -51,7 +49,7 @@ struct WatchDiceRollerView: View {
             }
 
 
-            Text("Result: \(result)")
+            Text("\((result == 0) ? " " : "\(result)")")
             .font(.title)
         }
         .sheet(isPresented: $showingConfigSheet) {

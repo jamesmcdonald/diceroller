@@ -18,4 +18,13 @@ struct RollConfig : Codable, Equatable {
     
     /// Any modifier, such as a +3 to an attack roll.
     var modifier: Int;
+    
+    /// Rolls the dice, returning a total and a list of the rolls
+    func roll() -> (total: Int, rolls: [Int]) {
+        let rolls = (1...numberOfDice).map { _ in
+            Int.random(in: 1...dieType.rawValue)
+        }
+        let total = rolls.reduce(0, +) + modifier
+        return (total, rolls)
+    }
 }

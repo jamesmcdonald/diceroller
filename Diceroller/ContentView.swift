@@ -9,8 +9,9 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var numberOfDice: Int = 1;
-    @State private var dieSelector: DieType = .d20;
+    @State private var dieType: DieType = DieType.defaultDie;
     @State private var modifier: Int = 0;
+    
     @State private var rolls: [Int] = [];
     @State private var result: Int = 0;
     @State private var rollsText: String = "";
@@ -44,20 +45,9 @@ struct ContentView: View {
     
     @State private var taglineIndex: Int = 0
     
-    func rollDice() -> [Int] {
-        var result: [Int] = [];
-        if numberOfDice < 0 {
-            return []
-        }
-        for _ in 0..<Int(numberOfDice) {
-            result.append(Int.random(in: 1...dieSelector.rawValue))
-        }
-        return result
-    }
-    
     func reset() {
         numberOfDice = 1
-        dieSelector = .d20
+        dieType = DieType.defaultDie
         modifier = 0
         result = 0
         rolls.removeAll()
@@ -90,7 +80,7 @@ struct ContentView: View {
         savedConfigs[newConfigName] = RollConfig(
             name: newConfigName,
             numberOfDice: numberOfDice,
-            dieType: dieSelector,
+            dieType: dieType,
             modifier: modifier
         )
         
@@ -119,8 +109,8 @@ struct ContentView: View {
                 }
             Form {
                 Section{
-                    Stepper("\(numberOfDice)\(dieSelector.description)", value: $numberOfDice, in: 1...50)
-                    Picker("Select a number", selection: $dieSelector) {
+                    Stepper("\(numberOfDice)\(dieType.description)", value: $numberOfDice, in: 1...50)
+                    Picker("Select a number", selection: $dieType) {
                         ForEach(DieType.allCases, id: \.self) { die in
                             Text("\(die.description)").tag(die)
                         }
@@ -138,17 +128,20 @@ struct ContentView: View {
             }
             .frame(maxHeight: 220)
 
-            Button("Roll \(numberOfDice)\(dieSelector.description)\(modifierText)", systemImage: "dice") {
-                rolls = rollDice()
-                result = rolls.map(\.self).reduce(0, +) + modifier
-                print("Roll \(numberOfDice) D\(dieSelector) + \(modifier) = \(result)")
+            Button("Roll \(numberOfDice)\(dieType.description)\(modifierText)", systemImage: "dice") {
+                (result, rolls) = RollConfig(
+                    name: "",
+                    numberOfDice: numberOfDice,
+                    dieType: dieType,
+                    modifier: modifier).roll()
+                print("Roll \(numberOfDice) \(dieType.description) + \(modifier) = \(result)")
                 
                 if rolls.count > 10 {
                     let firstFew = rolls.prefix(5).map(\.description).joined(separator: " + ")
                     let lastFew = rolls.suffix(2).map((\.description)).joined(separator: " + ")
-                    rollsText = "\(numberOfDice)D\(dieSelector) [\(firstFew) ... \(lastFew)] \(modifierText)"
+                    rollsText = "\(numberOfDice)\(dieType.description) [\(firstFew) ... \(lastFew)] \(modifierText)"
                 } else {
-                    rollsText = "\(numberOfDice)D\(dieSelector) [" +
+                    rollsText = "\(numberOfDice)\(dieType.description) [" +
                     rolls.map(\.description).joined(separator: " + ")
                     + "]" + modifierText
                 }
@@ -175,7 +168,7 @@ struct ContentView: View {
                             Button(name) {
                                 if let config = savedConfigs[name] {
                                     numberOfDice = config.numberOfDice
-                                    dieSelector = config.dieType
+                                    dieType = config.dieType
                                     modifier = config.modifier
                                 }
                                 showingRollCollection = false
