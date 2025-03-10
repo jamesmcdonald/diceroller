@@ -21,9 +21,6 @@ class WatchSyncManager: NSObject, WCSessionDelegate, ObservableObject {
     private func saveConfigsToStorage() {
         if let data = try? JSONEncoder().encode(savedConfigs) {
             UserDefaults.standard.set(data, forKey: "savedRolls")
-            print("✅ Saved configs: \(savedConfigs.keys)")
-        } else {
-            print("❌ Can't encode configs to save")
         }
     }
     
@@ -34,11 +31,8 @@ class WatchSyncManager: NSObject, WCSessionDelegate, ObservableObject {
                     if self.savedConfigs != decodedRolls {
                         self.savedConfigs = decodedRolls
                     }
-                    print("✅ Loaded saved configs: \(decodedRolls.keys)")
                 }
             }
-        } else {
-            print("❌ No saved configs found in storage")
         }
     }
 

@@ -31,7 +31,6 @@ class WatchSyncManager: NSObject, WCSessionDelegate, ObservableObject {
         do {
             try WCSession.default.updateApplicationContext(["savedRolls": encodedRolls as Any])
         } catch {
-            print("❌ Failed to update application context: \(error.localizedDescription)")
             WCSession.default.transferUserInfo(["savedRolls": encodedRolls as Any])
         }
     }
@@ -42,7 +41,6 @@ class WatchSyncManager: NSObject, WCSessionDelegate, ObservableObject {
             DispatchQueue.main.async {
                 self.savedConfigs = decodedRolls
             }
-            print("✅ iPhone received saved rolls: \(decodedRolls.keys)")
         }
     }
 

@@ -134,7 +134,6 @@ struct ContentView: View {
                     numberOfDice: numberOfDice,
                     dieType: dieType,
                     modifier: modifier).roll()
-                print("Roll \(numberOfDice) \(dieType.description) + \(modifier) = \(result)")
                 
                 if rolls.count > 10 {
                     let firstFew = rolls.prefix(5).map(\.description).joined(separator: " + ")
@@ -178,7 +177,6 @@ struct ContentView: View {
                 }
             }
             .onAppear() {
-                print ("loading")
                 loadConfigs()
             }
             
