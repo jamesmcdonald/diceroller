@@ -100,6 +100,21 @@ struct ContentView: View {
         saveConfigs()
     }
     
+    func natColor(for nat: Int?, dieType: DieType) -> Color {
+        guard let nat = nat else { return .primary }
+        if nat == 1 { return .red }
+        if nat == dieType.rawValue { return .green }
+        return .primary
+    }
+
+    func natText(for nat: Int?, result: Int, dieType: DieType) -> String {
+        guard let nat = nat else { return "\(result)" }
+        if dieType.rawValue == 20 && (nat == 1 || nat == dieType.rawValue) {
+            return "Nat \(nat) (\(result))"
+        }
+        return "\(result)"
+    }
+    
     var body: some View {
         VStack {
             Text("Diceroller")
@@ -152,12 +167,14 @@ struct ContentView: View {
             }
             .buttonStyle(.borderedProminent)
             .padding()
-            
-            Text("\(result == 0 ? "" : "\(result)")")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .center)
+                        
+            if result != 0 {
+                let nat = numberOfDice == 1 ? result - modifier : nil
+                Text(natText(for: nat, result: result, dieType: dieType))
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundColor(natColor(for: nat, dieType: dieType))
+            }
             Text("\(rollsText)")
 
             Spacer()
