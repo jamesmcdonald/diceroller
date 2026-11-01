@@ -48,12 +48,7 @@ final class RollStore {
     /// Inserts a copy of a configuration straight after it, with a unique name.
     @discardableResult
     func duplicate(_ config: RollConfig) -> RollConfig {
-        let copy = RollConfig(
-            name: uniqueName(basedOn: config.name),
-            numberOfDice: config.numberOfDice,
-            dieType: config.dieType,
-            modifier: config.modifier
-        )
+        let copy = RollConfig(name: uniqueName(basedOn: config.name), expression: config.expression)
         let index = configs.firstIndex(where: { $0.id == config.id }).map { $0 + 1 } ?? configs.endIndex
         configs.insert(copy, at: index)
         commit()
@@ -133,9 +128,16 @@ extension RollStore {
     static func preview() -> RollStore {
         let store = RollStore(defaults: UserDefaults(suiteName: "RollStorePreview") ?? .standard)
         store.replaceAll(with: [
-            RollConfig(name: "Attack", numberOfDice: 1, dieType: .d20, modifier: 5),
-            RollConfig(name: "Longsword", numberOfDice: 1, dieType: .d8, modifier: 3),
-            RollConfig(name: "Fireball", numberOfDice: 8, dieType: .d6, modifier: 0),
+            RollConfig(name: "Attack", expression: .simple(count: 1, sides: 20, modifier: 5)),
+            RollConfig(name: "Blessed Attack", expression: DiceExpression(terms: [
+                .init(sign: .plus, kind: .dice(count: 1, sides: 20, keep: nil)),
+                .init(sign: .plus, kind: .dice(count: 1, sides: 4, keep: nil)),
+                .init(sign: .plus, kind: .constant(5)),
+            ], advantage: .advantage)),
+            RollConfig(name: "Fireball", expression: .simple(count: 8, sides: 6, modifier: 0)),
+            RollConfig(name: "Ability Score", expression: DiceExpression(terms: [
+                .init(sign: .plus, kind: .dice(count: 4, sides: 6, keep: .dropLowest(1))),
+            ])),
         ])
         return store
     }

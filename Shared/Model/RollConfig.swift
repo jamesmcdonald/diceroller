@@ -7,54 +7,60 @@
 
 import Foundation
 
-/// A configuration for a saved roll, defining the number and type of dice, and any modifier.
-struct RollConfig : Codable, Equatable, Hashable, Identifiable {
-    /// The supported number of dice in a single roll, shared by the phone and watch UIs.
+/// A saved roll: a name and the dice expression to roll.
+struct RollConfig : Codable, Hashable, Identifiable {
+    /// The number of dice offered by the watch's custom roll wheel.
     static let numberOfDiceRange = 1...50
 
-    /// The supported modifier values, shared by the phone and watch UIs.
+    /// The modifiers offered by the watch's custom roll wheel.
     static let modifierRange = -20...20
 
     /// Stable identity, so a saved roll can be renamed or reordered without becoming a different roll.
     let id: UUID
 
     /// The name of this configuration, for example "Attack" or "Fireball"
-    var name: String;
+    var name: String
 
-    /// The number of dice to roll.
-    var numberOfDice: Int;
+    /// What to roll, for example "1d20 + 5".
+    var expression: DiceExpression
 
-    /// The type of die.
-    var dieType: DieType;
-
-    /// Any modifier, such as a +3 to an attack roll.
-    var modifier: Int;
-
-    init(id: UUID = UUID(), name: String, numberOfDice: Int, dieType: DieType, modifier: Int) {
+    init(id: UUID = UUID(), name: String, expression: DiceExpression) {
         self.id = id
         self.name = name
-        self.numberOfDice = numberOfDice
-        self.dieType = dieType
-        self.modifier = modifier
+        self.expression = expression
     }
 
-    /// Decodes a configuration, assigning a new id to data saved before ids existed.
+    private enum CodingKeys: String, CodingKey {
+        case id, name, expression
+        // Fields used before expressions, when a roll was always "NdX + modifier".
+        case numberOfDice, dieType, modifier
+    }
+
+    /// Decodes a configuration, upgrading data saved before ids or expressions existed.
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
         name = try container.decode(String.self, forKey: .name)
-        numberOfDice = try container.decode(Int.self, forKey: .numberOfDice)
-        dieType = try container.decode(DieType.self, forKey: .dieType)
-        modifier = try container.decode(Int.self, forKey: .modifier)
+        if let expression = try container.decodeIfPresent(DiceExpression.self, forKey: .expression) {
+            self.expression = expression
+        } else {
+            let numberOfDice = try container.decode(Int.self, forKey: .numberOfDice)
+            let dieType = try container.decode(DieType.self, forKey: .dieType)
+            let modifier = try container.decode(Int.self, forKey: .modifier)
+            expression = .simple(count: numberOfDice, sides: dieType.rawValue, modifier: modifier)
+        }
     }
 
-    /// Dice notation for this configuration, for example "2D6 + 3".
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(expression, forKey: .expression)
+    }
+
+    /// Dice notation for this configuration, for example "2d6 + 3".
     var notation: String {
-        let dice = "\(numberOfDice)\(dieType.description)"
-        if modifier == 0 {
-            return dice
-        }
-        return modifier > 0 ? "\(dice) + \(modifier)" : "\(dice) - \(abs(modifier))"
+        expression.description
     }
 
     /// Rolls the dice using the system random number generator.
@@ -65,9 +71,6 @@ struct RollConfig : Codable, Equatable, Hashable, Identifiable {
 
     /// Rolls the dice using the given generator, so tests can supply a seeded one.
     func roll<G: RandomNumberGenerator>(using generator: inout G) -> RollResult {
-        let rolls = (0..<numberOfDice).map { _ in
-            Int.random(in: 1...dieType.rawValue, using: &generator)
-        }
-        return RollResult(dieType: dieType, rolls: rolls, modifier: modifier)
+        expression.roll(using: &generator)
     }
 }

@@ -19,11 +19,13 @@ struct RollConfigEditor: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var config: RollConfig
+    @State private var expressionText: String
     @FocusState private var isNameFocused: Bool
     private let isNew: Bool
 
     init(request: EditorRequest) {
         _config = State(initialValue: request.config)
+        _expressionText = State(initialValue: request.config.notation)
         isNew = request.isNew
     }
 
@@ -35,8 +37,12 @@ struct RollConfigEditor: View {
         store.isNameTaken(trimmedName, excluding: config.id)
     }
 
+    private var expression: DiceExpression? {
+        try? DiceExpressionParser.parse(expressionText)
+    }
+
     private var canSave: Bool {
-        !trimmedName.isEmpty && !isNameTaken
+        !trimmedName.isEmpty && !isNameTaken && expression != nil
     }
 
     var body: some View {
@@ -55,9 +61,9 @@ struct RollConfigEditor: View {
                 }
 
                 Section {
-                    RollConfigControls(config: $config)
+                    DiceExpressionControls(text: $expressionText)
                 } footer: {
-                    Text("Rolls \(config.notation)")
+                    Text("Combine dice like 2d6 + 1d4 + 3. Use dl1 to drop the lowest die (4d6dl1), kh1 to keep the highest (2d20kh1), and (adv) or (dis) for a d20 roll.")
                 }
             }
             .navigationTitle(isNew ? "Save Roll" : "Edit Roll")
@@ -80,8 +86,9 @@ struct RollConfigEditor: View {
     }
 
     private func save() {
-        guard canSave else { return }
+        guard canSave, let expression else { return }
         config.name = trimmedName
+        config.expression = expression
         if isNew {
             store.add(config)
         } else {
@@ -93,7 +100,7 @@ struct RollConfigEditor: View {
 
 #Preview {
     RollConfigEditor(request: EditorRequest(
-        config: RollConfig(name: "", numberOfDice: 1, dieType: .d20, modifier: 5),
+        config: RollConfig(name: "", expression: .simple(count: 1, sides: 20, modifier: 5)),
         isNew: true
     ))
     .environment(RollStore.preview())

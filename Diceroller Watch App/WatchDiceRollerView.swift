@@ -12,13 +12,25 @@ enum WatchRoute: Hashable {
     case customRoll
 }
 
+/// The custom roll's wheel positions. The id stays fixed so pushing the roll reuses the same identity.
+struct CustomRollSettings: Hashable {
+    let id = UUID()
+    var numberOfDice = 1
+    var dieType = DieType.defaultDie
+    var modifier = 0
+
+    var config: RollConfig {
+        RollConfig(id: id, name: "", expression: .simple(count: numberOfDice, sides: dieType.rawValue, modifier: modifier))
+    }
+}
+
 /// The watch's first screen: saved rolls synced from the phone, plus a custom roll.
 /// Tapping a saved roll rolls it straight away.
 struct WatchDiceRollerView: View {
     @Environment(RollStore.self) private var store
 
     /// Kept here so the custom roll remembers its last settings while the app is running.
-    @State private var customRoll = RollConfig(name: "", numberOfDice: 1, dieType: .defaultDie, modifier: 0)
+    @State private var customRoll = CustomRollSettings()
 
     var body: some View {
         NavigationStack {
@@ -62,7 +74,7 @@ struct WatchDiceRollerView: View {
 
 /// Picks dice, die type, and modifier with three wheels that follow the Digital Crown.
 struct CustomRollView: View {
-    @Binding var config: RollConfig
+    @Binding var config: CustomRollSettings
 
     var body: some View {
         VStack {
@@ -85,12 +97,12 @@ struct CustomRollView: View {
             }
             .pickerStyle(.wheel)
 
-            NavigationLink(value: config) {
+            NavigationLink(value: config.config) {
                 Label("Roll", systemImage: "dice")
             }
             .buttonStyle(.borderedProminent)
         }
-        .navigationTitle(config.notation)
+        .navigationTitle(config.config.notation)
     }
 }
 
@@ -146,7 +158,7 @@ struct WatchRollView: View {
 }
 
 #Preview("Custom Roll") {
-    @Previewable @State var config = RollConfig(name: "", numberOfDice: 2, dieType: .d6, modifier: 3)
+    @Previewable @State var config = CustomRollSettings(numberOfDice: 2, dieType: .d6, modifier: 3)
     NavigationStack {
         CustomRollView(config: $config)
     }
@@ -154,6 +166,6 @@ struct WatchRollView: View {
 
 #Preview("Roll Result") {
     NavigationStack {
-        WatchRollView(config: RollConfig(name: "Fireball", numberOfDice: 8, dieType: .d6, modifier: 0))
+        WatchRollView(config: RollConfig(name: "Blessed Attack", expression: (try? DiceExpressionParser.parse("1d20 + 1d4 + 5 (adv)")) ?? .simple(count: 1, sides: 20, modifier: 5)))
     }
 }

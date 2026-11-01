@@ -21,8 +21,8 @@ struct RollResultBanner: View {
     private var result: RollResult { lastRoll.result }
 
     private var totalText: String {
-        if let nat = result.natural, result.dieType == .d20, result.isNaturalOne || result.isNaturalMax {
-            return "Nat \(nat) (\(result.total))"
+        if let nat = result.naturalDie, nat.sides == 20, result.isNaturalOne || result.isNaturalMax {
+            return "Nat \(nat.value) (\(result.total))"
         }
         return "\(result.total)"
     }

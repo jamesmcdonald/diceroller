@@ -16,7 +16,7 @@ enum DieType : Int, Codable, CaseIterable {
     case d100 = 100
     
     var description: String {
-        "D\(rawValue)"
+        "d\(rawValue)"
     }
     
     static let defaultDie: DieType = d20
