@@ -84,7 +84,6 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1ACF8E232D7CDD5500626E97"
             BuildableName = "Diceroller Watch App.app"
-            BlueprintName = "Diceroller Watch App"
             ReferencedContainer = "container:Diceroller.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -101,7 +100,6 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1ACF8E232D7CDD5500626E97"
             BuildableName = "Diceroller Watch App.app"
-            BlueprintName = "Diceroller Watch App"
             ReferencedContainer = "container:Diceroller.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

@@ -1,5 +1,5 @@
 //
-//  WatchSyncManager.swift
+//  PhoneSyncManager.swift
 //  Diceroller
 //
 //  Created by James McDonald on 08/03/2025.
@@ -7,12 +7,12 @@
 
 import WatchConnectivity
 
-class WatchSyncManager: NSObject, WCSessionDelegate, ObservableObject {
+class PhoneSyncManager: NSObject, WCSessionDelegate, ObservableObject {
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {
         
     }
     
-    static let shared = WatchSyncManager()
+    static let shared = PhoneSyncManager()
     @Published var savedConfigs: [String: RollConfig] = [:]
 
     private override init() {

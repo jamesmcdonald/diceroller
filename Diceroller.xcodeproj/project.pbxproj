@@ -30,21 +30,21 @@
 			containerPortal = 1ACF8DE82D7C870500626E97 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 1ACF8E232D7CDD5500626E97;
-			remoteInfo = "Diceroller Watch Watch App";
+			remoteInfo = "Diceroller Watch App";
 		};
 		1ACF8E3E2D7CDD5600626E97 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 1ACF8DE82D7C870500626E97 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 1ACF8E232D7CDD5500626E97;
-			remoteInfo = "Diceroller Watch Watch App";
+			remoteInfo = "Diceroller Watch App";
 		};
 		1ACF8E452D7CDD5600626E97 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 1ACF8DE82D7C870500626E97 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 1ACF8E232D7CDD5500626E97;
-			remoteInfo = "Diceroller Watch Watch App";
+			remoteInfo = "Diceroller Watch App";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -275,7 +275,7 @@
 			name = "Diceroller Watch App";
 			packageProductDependencies = (
 			);
-			productName = "Diceroller Watch Watch App";
+			productName = "Diceroller Watch App";
 			productReference = 1ACF8E242D7CDD5500626E97 /* Diceroller Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -298,7 +298,7 @@
 			name = "Diceroller Watch AppTests";
 			packageProductDependencies = (
 			);
-			productName = "Diceroller Watch Watch AppTests";
+			productName = "Diceroller Watch AppTests";
 			productReference = 1ACF8E332D7CDD5600626E97 /* Diceroller Watch AppTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
@@ -321,7 +321,7 @@
 			name = "Diceroller Watch AppUITests";
 			packageProductDependencies = (
 			);
-			productName = "Diceroller Watch Watch AppUITests";
+			productName = "Diceroller Watch AppUITests";
 			productReference = 1ACF8E3D2D7CDD5600626E97 /* Diceroller Watch AppUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
@@ -762,7 +762,7 @@
 				DEVELOPMENT_TEAM = 89PR9JS5JX;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Diceroller Watch";
+				INFOPLIST_KEY_CFBundleDisplayName = Diceroller;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.jamesmcdonald.Diceroller;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -792,7 +792,7 @@
 				DEVELOPMENT_TEAM = 89PR9JS5JX;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Diceroller Watch";
+				INFOPLIST_KEY_CFBundleDisplayName = Diceroller;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.jamesmcdonald.Diceroller;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -826,7 +826,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Diceroller Watch Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Diceroller Watch Watch App";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Diceroller Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Diceroller Watch App";
 				WATCHOS_DEPLOYMENT_TARGET = 11.2;
 			};
 			name = Debug;
@@ -846,7 +846,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Diceroller Watch Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Diceroller Watch Watch App";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Diceroller Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Diceroller Watch App";
 				WATCHOS_DEPLOYMENT_TARGET = 11.2;
 			};
 			name = Release;
@@ -865,7 +865,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				TEST_TARGET_NAME = "Diceroller Watch Watch App";
+				TEST_TARGET_NAME = "Diceroller Watch App";
 				WATCHOS_DEPLOYMENT_TARGET = 11.2;
 			};
 			name = Debug;
@@ -884,7 +884,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				TEST_TARGET_NAME = "Diceroller Watch Watch App";
+				TEST_TARGET_NAME = "Diceroller Watch App";
 				WATCHOS_DEPLOYMENT_TARGET = 11.2;
 			};
 			name = Release;

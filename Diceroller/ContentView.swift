@@ -68,7 +68,7 @@ struct ContentView: View {
         if let encoded = try? JSONEncoder().encode(savedConfigs) {
             UserDefaults.standard.set(encoded, forKey: "savedConfigs")
         }
-        WatchSyncManager.shared.syncSavedRolls(savedConfigs)
+        PhoneSyncManager.shared.syncSavedRolls(savedConfigs)
     }
 
     func loadConfigs() {

@@ -1,13 +1,13 @@
 //
-//  Diceroller_Watch_Watch_AppUITestsLaunchTests.swift
-//  Diceroller Watch Watch AppUITests
+//  Diceroller_Watch_AppUITestsLaunchTests.swift
+//  Diceroller Watch AppUITests
 //
 //  Created by James McDonald on 08/03/2025.
 //
 
 import XCTest
 
-final class Diceroller_Watch_Watch_AppUITestsLaunchTests: XCTestCase {
+final class Diceroller_Watch_AppUITestsLaunchTests: XCTestCase {
 
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
         true

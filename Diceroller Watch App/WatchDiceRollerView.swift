@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  Diceroller Watch Watch App
+//  Diceroller Watch App
 //
 //  Created by James McDonald on 08/03/2025.
 //

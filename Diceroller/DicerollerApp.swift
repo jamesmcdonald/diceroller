@@ -10,7 +10,7 @@ import SwiftUI
 @main
 struct DicerollerApp: App {
     init() {
-        _ = WatchSyncManager.shared // Force init to run
+        _ = PhoneSyncManager.shared // Force init to run
     }
     
     var body: some Scene {

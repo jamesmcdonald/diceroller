@@ -1,13 +1,13 @@
 //
-//  Diceroller_Watch_Watch_AppUITests.swift
-//  Diceroller Watch Watch AppUITests
+//  Diceroller_Watch_AppUITests.swift
+//  Diceroller Watch AppUITests
 //
 //  Created by James McDonald on 08/03/2025.
 //
 
 import XCTest
 
-final class Diceroller_Watch_Watch_AppUITests: XCTestCase {
+final class Diceroller_Watch_AppUITests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.

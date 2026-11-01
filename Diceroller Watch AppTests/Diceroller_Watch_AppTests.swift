@@ -1,14 +1,14 @@
 //
-//  Diceroller_Watch_Watch_AppTests.swift
-//  Diceroller Watch Watch AppTests
+//  Diceroller_Watch_AppTests.swift
+//  Diceroller Watch AppTests
 //
 //  Created by James McDonald on 08/03/2025.
 //
 
 import Testing
-@testable import Diceroller_Watch_Watch_App
+@testable import Diceroller_Watch_App
 
-struct Diceroller_Watch_Watch_AppTests {
+struct Diceroller_Watch_AppTests {
 
     @Test func example() async throws {
         // Write your test here and use APIs like `#expect(...)` to check expected conditions.
