@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(RollStore.self) private var store
+
     // Main form state
     @State private var taglineIndex: Int = 0
     
@@ -15,14 +17,10 @@ struct ContentView: View {
     @State private var dieType: DieType = DieType.defaultDie;
     @State private var modifier: Int = 0;
     
-    @State private var result: Int = 0;
-    @State private var rollsText: String = "";
+    @State private var lastRoll: RollResult?
     
     // Save form state
     @State private var newConfigName = ""
-
-    // Configs form state
-    @State private var savedConfigs: [String: RollConfig] = [:]
 
     // Form toggles
     @State private var showingRollCollection: Bool = false;
@@ -54,65 +52,50 @@ struct ContentView: View {
         numberOfDice = 1
         dieType = DieType.defaultDie
         modifier = 0
-        result = 0
-        rollsText = ""
-    }
-    
-    func startTaglineTimer() {
-        Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { _ in
-            taglineIndex = Int.random(in: 0..<taglines.count)
-        }
-    }
-    
-    func saveConfigs() {
-        if let encoded = try? JSONEncoder().encode(savedConfigs) {
-            UserDefaults.standard.set(encoded, forKey: "savedConfigs")
-        }
-        PhoneSyncManager.shared.syncSavedRolls(savedConfigs)
-    }
-
-    func loadConfigs() {
-        if let savedData = UserDefaults.standard.data(forKey: "savedConfigs"),
-           let decoded = try? JSONDecoder().decode([String: RollConfig].self, from: savedData) {
-            savedConfigs = decoded
-        }
+        lastRoll = nil
     }
     
     func saveRollConfig() {
         guard !newConfigName.isEmpty else { return }
         
-        savedConfigs[newConfigName] = RollConfig(
+        store.save(RollConfig(
             name: newConfigName,
             numberOfDice: numberOfDice,
             dieType: dieType,
             modifier: modifier
-        )
+        ))
         
-        saveConfigs()
         newConfigName = ""
     }
     
     func deleteConfig(at offsets: IndexSet) {
-        for index in offsets {
-            let keyToDelete = savedConfigs.keys.sorted()[index]
-            savedConfigs.removeValue(forKey: keyToDelete)
-        }
-        saveConfigs()
+        let names = store.sortedNames
+        store.delete(names: offsets.map { names[$0] })
     }
     
-    func natColor(for nat: Int?, dieType: DieType) -> Color {
-        guard let nat = nat else { return .primary }
-        if nat == 1 { return .red }
-        if nat == dieType.rawValue { return .green }
+    func natColor(for roll: RollResult) -> Color {
+        if roll.isNaturalOne { return .red }
+        if roll.isNaturalMax { return .green }
         return .primary
     }
 
-    func natText(for nat: Int?, result: Int, dieType: DieType) -> String {
-        guard let nat = nat else { return "\(result)" }
-        if dieType.rawValue == 20 && (nat == 1 || nat == dieType.rawValue) {
-            return "Nat \(nat) (\(result))"
+    func natText(for roll: RollResult) -> String {
+        if let nat = roll.natural, roll.dieType == .d20, roll.isNaturalOne || roll.isNaturalMax {
+            return "Nat \(nat) (\(roll.total))"
         }
-        return "\(result)"
+        return "\(roll.total)"
+    }
+
+    /// Describes the individual dice, abbreviating long lists of rolls.
+    func rollsText(for roll: RollResult) -> String {
+        let dice = "\(roll.rolls.count)\(roll.dieType.description)"
+        let rollModifierText = roll.modifier == 0 ? "" : (roll.modifier > 0 ? " + \(roll.modifier)" : " - \(abs(roll.modifier))")
+        if roll.rolls.count > 10 {
+            let firstFew = roll.rolls.prefix(5).map(\.description).joined(separator: " + ")
+            let lastFew = roll.rolls.suffix(2).map(\.description).joined(separator: " + ")
+            return "\(dice) [\(firstFew) ... \(lastFew)]\(rollModifierText)"
+        }
+        return "\(dice) [" + roll.rolls.map(\.description).joined(separator: " + ") + "]" + rollModifierText
     }
     
     var body: some View {
@@ -122,13 +105,15 @@ struct ContentView: View {
                 .multilineTextAlignment(.center)
                 .padding(.bottom)
             Text("\(taglines[taglineIndex])").italic()
-                .onAppear {
-                    taglineIndex = Int.random(in: 0..<taglines.count)
-                    startTaglineTimer()
+                .task {
+                    // Pick a new tagline now and every 5 minutes; the loop ends when the view disappears.
+                    repeat {
+                        taglineIndex = Int.random(in: 0..<taglines.count)
+                    } while (try? await Task.sleep(for: .seconds(300))) != nil
                 }
             Form {
                 Section{
-                    Stepper("\(numberOfDice)\(dieType.description)", value: $numberOfDice, in: 1...50)
+                    Stepper("\(numberOfDice)\(dieType.description)", value: $numberOfDice, in: RollConfig.numberOfDiceRange)
                     Picker("Select a number", selection: $dieType) {
                         ForEach(DieType.allCases, id: \.self) { die in
                             Text("\(die.description)").tag(die)
@@ -141,41 +126,29 @@ struct ContentView: View {
                     HStack {
                         Text("Modifier:")
                         Spacer()
-                        Stepper("\(modifier > 0 ? "+" : "")\(modifier)", value: $modifier)
+                        Stepper("\(modifier > 0 ? "+" : "")\(modifier)", value: $modifier, in: RollConfig.modifierRange)
                     }
                 }
             }
             .frame(maxHeight: 220)
 
             Button("Roll \(numberOfDice)\(dieType.description)\(modifierText)", systemImage: "dice") {
-                var rolls: [Int]
-                (result, rolls) = RollConfig(
+                lastRoll = RollConfig(
                     name: "",
                     numberOfDice: numberOfDice,
                     dieType: dieType,
                     modifier: modifier).roll()
-                
-                if rolls.count > 10 {
-                    let firstFew = rolls.prefix(5).map(\.description).joined(separator: " + ")
-                    let lastFew = rolls.suffix(2).map((\.description)).joined(separator: " + ")
-                    rollsText = "\(numberOfDice)\(dieType.description) [\(firstFew) ... \(lastFew)] \(modifierText)"
-                } else {
-                    rollsText = "\(numberOfDice)\(dieType.description) [" +
-                    rolls.map(\.description).joined(separator: " + ")
-                    + "]" + modifierText
-                }
             }
             .buttonStyle(.borderedProminent)
             .padding()
                         
-            if result != 0 {
-                let nat = numberOfDice == 1 ? result - modifier : nil
-                Text(natText(for: nat, result: result, dieType: dieType))
+            if let lastRoll {
+                Text(natText(for: lastRoll))
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                    .foregroundColor(natColor(for: nat, dieType: dieType))
+                    .foregroundColor(natColor(for: lastRoll))
+                Text(rollsText(for: lastRoll))
             }
-            Text("\(rollsText)")
 
             Spacer()
             
@@ -185,9 +158,9 @@ struct ContentView: View {
             .buttonStyle(.borderedProminent)
             .sheet(isPresented: $showingRollCollection) {
                 List {
-                    ForEach(savedConfigs.keys.sorted(), id: \.self) {name in
+                    ForEach(store.sortedNames, id: \.self) {name in
                             Button(name) {
-                                if let config = savedConfigs[name] {
+                                if let config = store.savedConfigs[name] {
                                     numberOfDice = config.numberOfDice
                                     dieType = config.dieType
                                     modifier = config.modifier
@@ -197,9 +170,6 @@ struct ContentView: View {
                     }
                     .onDelete(perform: deleteConfig)
                 }
-            }
-            .onAppear() {
-                loadConfigs()
             }
             
             Button("Save Config") {
@@ -226,4 +196,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .environment(RollStore())
 }

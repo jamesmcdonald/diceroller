@@ -8,10 +8,12 @@
 import SwiftUI
 
 struct WatchDiceRollerView: View {
+    @Environment(RollStore.self) private var store
+
     @State private var numberOfDice: Int = 1
     @State private var selectedDie: DieType = DieType.defaultDie
     @State private var modifier: Int = 0
-    @State private var result: Int = 0
+    @State private var lastRoll: RollResult?
     @State private var showingConfigSheet: Bool = false
     @State private var showingSavedRolls: Bool = false
 
@@ -26,7 +28,7 @@ struct WatchDiceRollerView: View {
                 }
                 
                 Button("🎲") {
-                    (result, _) = RollConfig(name: "Default", numberOfDice: numberOfDice, dieType: selectedDie, modifier: modifier).roll()
+                    lastRoll = RollConfig(name: "Default", numberOfDice: numberOfDice, dieType: selectedDie, modifier: modifier).roll()
                     WKInterfaceDevice.current().play(.success)
                 }
             }
@@ -36,9 +38,9 @@ struct WatchDiceRollerView: View {
             .padding()
             
             .sheet(isPresented: $showingSavedRolls) {
-                List(WatchSyncManager.shared.savedConfigs.keys.sorted(), id: \.self) { name in
+                List(store.sortedNames, id: \.self) { name in
                     Button(name) {
-                        if let config = WatchSyncManager.shared.savedConfigs[name] {
+                        if let config = store.savedConfigs[name] {
                             numberOfDice = config.numberOfDice
                             selectedDie = config.dieType
                             modifier = config.modifier
@@ -49,7 +51,7 @@ struct WatchDiceRollerView: View {
             }
 
 
-            Text("\((result == 0) ? " " : "\(result)")")
+            Text(lastRoll.map { "\($0.total)" } ?? " ")
             .font(.title)
         }
         .sheet(isPresented: $showingConfigSheet) {
@@ -86,7 +88,7 @@ struct DiceConfigView: View {
             .sheet(isPresented: $showingDicePicker) {
                 SelectionView(
                     title: "Select Number of Dice",
-                    options: Array(1...10),
+                    options: Array(RollConfig.numberOfDiceRange),
                     selected: $numberOfDice,
                     format: { "\($0)"},
                     dismiss: { showingDicePicker = false }
@@ -122,7 +124,7 @@ struct DiceConfigView: View {
             .sheet(isPresented: $showingModifierPicker) {
                 SelectionView(
                     title: "Select Modifier",
-                    options: Array(-10...10),
+                    options: Array(RollConfig.modifierRange),
                     selected: $modifier,
                     format: { "\($0 >= 0 ? "+" : "")\($0)" },
                     dismiss: { showingModifierPicker = false }
@@ -164,4 +166,5 @@ struct SelectionView<T: Hashable>: View {
 
 #Preview {
     WatchDiceRollerView()
+        .environment(RollStore())
 }

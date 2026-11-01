@@ -5,66 +5,45 @@
 //  Created by James McDonald on 08/03/2025.
 //
 
-import ObjectiveC
-import Foundation
 import WatchConnectivity
 
-class WatchSyncManager: NSObject, WCSessionDelegate, ObservableObject {
-    
-    static let shared = WatchSyncManager()
-    @Published var savedConfigs: [String: RollConfig] = [:] {
-        didSet {
-            saveConfigsToStorage()
-        }
-    }
-    
-    private func saveConfigsToStorage() {
-        if let data = try? JSONEncoder().encode(savedConfigs) {
-            UserDefaults.standard.set(data, forKey: "savedRolls")
-        }
-    }
-    
-    private func loadConfigsFromStorage() {
-        if let data = UserDefaults.standard.data(forKey: "savedRolls") {
-            if let decodedRolls = try? JSONDecoder().decode([String: RollConfig].self, from: data) {
-                DispatchQueue.main.async {
-                    if self.savedConfigs != decodedRolls {
-                        self.savedConfigs = decodedRolls
-                    }
-                }
-            }
-        }
-    }
+/// Receives saved configurations from the phone and writes them into the store.
+@MainActor
+final class WatchSyncManager: NSObject, WCSessionDelegate {
+    private let store: RollStore
 
-    private override init() {
+    init(store: RollStore) {
+        self.store = store
         super.init()
-        loadConfigsFromStorage()
+
         if WCSession.isSupported() {
             let session = WCSession.default
-            if session.activationState == .notActivated {
-                session.delegate = self
-                session.activate()
-            }
+            session.delegate = self
+            session.activate()
         }
     }
 
-    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {
+    private func apply(_ configs: [String: RollConfig]) {
+        store.replaceAll(with: configs)
     }
-    
-    func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
-        handleIncomingData(applicationContext)
+
+    // MARK: - WCSessionDelegate
+
+    nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {
+        // Pick up any context the phone sent while this app wasn't running.
+        guard activationState == .activated,
+              let configs = SyncPayload.decode(session.receivedApplicationContext) else {
+            return
+        }
+        Task { @MainActor in
+            self.apply(configs)
+        }
     }
-    
-    func session(_ session: WCSession, didReceiveUserInfo userInfo: [String : Any] = [:]) {
-        handleIncomingData(userInfo)
-    }
-    
-    func handleIncomingData(_ data: [String: Any]) {
-        if let encodedRolls = data["savedRolls"] as? Data,
-            let decodedRolls = try? JSONDecoder().decode([String: RollConfig].self, from: encodedRolls) {
-            DispatchQueue.main.async {
-                self.savedConfigs = decodedRolls
-            }
+
+    nonisolated func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
+        guard let configs = SyncPayload.decode(applicationContext) else { return }
+        Task { @MainActor in
+            self.apply(configs)
         }
     }
 }
