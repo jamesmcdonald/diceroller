@@ -33,4 +33,20 @@ struct RollResult: Equatable {
     var isNaturalOne: Bool {
         natural == 1
     }
+
+    /// The individual dice and modifier, for example "2D6 [3 + 5] + 2".
+    /// Long lists of dice are abbreviated to the first five and last two.
+    var breakdown: String {
+        let dice = "\(rolls.count)\(dieType.description)"
+        let faces: String
+        if rolls.count > 10 {
+            let firstFew = rolls.prefix(5).map(\.description).joined(separator: " + ")
+            let lastFew = rolls.suffix(2).map(\.description).joined(separator: " + ")
+            faces = "\(firstFew) ... \(lastFew)"
+        } else {
+            faces = rolls.map(\.description).joined(separator: " + ")
+        }
+        let modifierText = modifier == 0 ? "" : (modifier > 0 ? " + \(modifier)" : " - \(abs(modifier))")
+        return "\(dice) [\(faces)]\(modifierText)"
+    }
 }

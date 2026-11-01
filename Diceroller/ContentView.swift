@@ -10,22 +10,13 @@ import SwiftUI
 struct ContentView: View {
     @Environment(RollStore.self) private var store
 
-    // Main form state
+    @State private var quickRoll = ContentView.defaultQuickRoll
+    @State private var lastRoll: LastRoll?
+    @State private var editorRequest: EditorRequest?
     @State private var taglineIndex: Int = 0
-    
-    @State private var numberOfDice: Int = 1;
-    @State private var dieType: DieType = DieType.defaultDie;
-    @State private var modifier: Int = 0;
-    
-    @State private var lastRoll: RollResult?
-    
-    // Save form state
-    @State private var newConfigName = ""
 
-    // Form toggles
-    @State private var showingRollCollection: Bool = false;
-    @State private var showingSaveAlert = false
-    
+    private static let defaultQuickRoll = RollConfig(name: "", numberOfDice: 1, dieType: .defaultDie, modifier: 0)
+
     private let taglines: [String] = [
         "It's dicy",
         "Now with 50% more random",
@@ -40,161 +31,154 @@ struct ContentView: View {
         "Roll high, live large",
         "Only a 1 in 20 chance of critical miss!"
     ]
-    
-    var modifierText: String {
-        if modifier == 0 {
-            return ""
-        }
-        return modifier > 0 ? " + \(modifier)" : " - \(abs(modifier))"
-    }
-    
-    func reset() {
-        numberOfDice = 1
-        dieType = DieType.defaultDie
-        modifier = 0
-        lastRoll = nil
-    }
-    
-    func saveRollConfig() {
-        guard !newConfigName.isEmpty else { return }
-        
-        store.save(RollConfig(
-            name: newConfigName,
-            numberOfDice: numberOfDice,
-            dieType: dieType,
-            modifier: modifier
-        ))
-        
-        newConfigName = ""
-    }
-    
-    func deleteConfig(at offsets: IndexSet) {
-        let names = store.sortedNames
-        store.delete(names: offsets.map { names[$0] })
-    }
-    
-    func natColor(for roll: RollResult) -> Color {
-        if roll.isNaturalOne { return .red }
-        if roll.isNaturalMax { return .green }
-        return .primary
-    }
 
-    func natText(for roll: RollResult) -> String {
-        if let nat = roll.natural, roll.dieType == .d20, roll.isNaturalOne || roll.isNaturalMax {
-            return "Nat \(nat) (\(roll.total))"
-        }
-        return "\(roll.total)"
-    }
-
-    /// Describes the individual dice, abbreviating long lists of rolls.
-    func rollsText(for roll: RollResult) -> String {
-        let dice = "\(roll.rolls.count)\(roll.dieType.description)"
-        let rollModifierText = roll.modifier == 0 ? "" : (roll.modifier > 0 ? " + \(roll.modifier)" : " - \(abs(roll.modifier))")
-        if roll.rolls.count > 10 {
-            let firstFew = roll.rolls.prefix(5).map(\.description).joined(separator: " + ")
-            let lastFew = roll.rolls.suffix(2).map(\.description).joined(separator: " + ")
-            return "\(dice) [\(firstFew) ... \(lastFew)]\(rollModifierText)"
-        }
-        return "\(dice) [" + roll.rolls.map(\.description).joined(separator: " + ") + "]" + rollModifierText
-    }
-    
     var body: some View {
-        VStack {
-            Text("Diceroller")
-                .font(.largeTitle)
-                .multilineTextAlignment(.center)
-                .padding(.bottom)
-            Text("\(taglines[taglineIndex])").italic()
-                .task {
-                    // Pick a new tagline now and every 5 minutes; the loop ends when the view disappears.
-                    repeat {
-                        taglineIndex = Int.random(in: 0..<taglines.count)
-                    } while (try? await Task.sleep(for: .seconds(300))) != nil
+        NavigationStack {
+            List {
+                Section {
+                    RollConfigControls(config: $quickRoll)
+
+                    Button {
+                        roll(quickRoll, title: "Quick Roll")
+                    } label: {
+                        Label("Roll \(quickRoll.notation)", systemImage: "dice")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                } header: {
+                    HStack {
+                        Text("Quick Roll")
+                        Spacer()
+                        Button("Reset", action: reset)
+                            .font(.footnote)
+                            .textCase(nil)
+                    }
+                } footer: {
+                    Text(taglines[taglineIndex])
+                        .italic()
+                        .task {
+                            // Pick a new tagline now and every 5 minutes; the loop ends when the view disappears.
+                            repeat {
+                                taglineIndex = Int.random(in: 0..<taglines.count)
+                            } while (try? await Task.sleep(for: .seconds(300))) != nil
+                        }
                 }
-            Form {
-                Section{
-                    Stepper("\(numberOfDice)\(dieType.description)", value: $numberOfDice, in: RollConfig.numberOfDiceRange)
-                    Picker("Select a number", selection: $dieType) {
-                        ForEach(DieType.allCases, id: \.self) { die in
-                            Text("\(die.description)").tag(die)
+
+                Section("Saved Rolls") {
+                    if store.configs.isEmpty {
+                        Text("Tap + to save the quick roll, then roll it again here with one tap.")
+                            .foregroundStyle(.secondary)
+                    }
+
+                    ForEach(store.configs) { config in
+                        SavedRollRow(config: config) {
+                            roll(config, title: config.name)
+                        }
+                        .swipeActions(edge: .trailing) {
+                            Button("Delete", systemImage: "trash", role: .destructive) {
+                                store.delete(ids: [config.id])
+                            }
+                            Button("Edit", systemImage: "pencil") {
+                                editorRequest = EditorRequest(config: config, isNew: false)
+                            }
+                        }
+                        .swipeActions(edge: .leading) {
+                            Button("Duplicate", systemImage: "plus.square.on.square") {
+                                store.duplicate(config)
+                            }
+                            .tint(.indigo)
+                        }
+                        .contextMenu {
+                            Button("Edit", systemImage: "pencil") {
+                                editorRequest = EditorRequest(config: config, isNew: false)
+                            }
+                            Button("Duplicate", systemImage: "plus.square.on.square") {
+                                store.duplicate(config)
+                            }
+                            Button("Delete", systemImage: "trash", role: .destructive) {
+                                store.delete(ids: [config.id])
+                            }
                         }
                     }
-                    .pickerStyle(SegmentedPickerStyle()) // Options: `MenuPickerStyle`, `SegmentedPickerStyle`, `WheelPickerStyle`
-                }
-                
-                Section {
-                    HStack {
-                        Text("Modifier:")
-                        Spacer()
-                        Stepper("\(modifier > 0 ? "+" : "")\(modifier)", value: $modifier, in: RollConfig.modifierRange)
+                    .onMove(perform: store.move)
+                    .onDelete { offsets in
+                        store.delete(ids: Set(offsets.map { store.configs[$0].id }))
                     }
                 }
             }
-            .frame(maxHeight: 220)
-
-            Button("Roll \(numberOfDice)\(dieType.description)\(modifierText)", systemImage: "dice") {
-                lastRoll = RollConfig(
-                    name: "",
-                    numberOfDice: numberOfDice,
-                    dieType: dieType,
-                    modifier: modifier).roll()
-            }
-            .buttonStyle(.borderedProminent)
-            .padding()
-                        
-            if let lastRoll {
-                Text(natText(for: lastRoll))
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundColor(natColor(for: lastRoll))
-                Text(rollsText(for: lastRoll))
-            }
-
-            Spacer()
-            
-            Button("Saved Configs") {
-                showingRollCollection = true
-            }
-            .buttonStyle(.borderedProminent)
-            .sheet(isPresented: $showingRollCollection) {
-                List {
-                    ForEach(store.sortedNames, id: \.self) {name in
-                            Button(name) {
-                                if let config = store.savedConfigs[name] {
-                                    numberOfDice = config.numberOfDice
-                                    dieType = config.dieType
-                                    modifier = config.modifier
-                                }
-                                showingRollCollection = false
-                            }
+            .navigationTitle("Diceroller")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    EditButton()
+                        .disabled(store.configs.isEmpty)
+                }
+                ToolbarItem(placement: .primaryAction) {
+                    Button("Save Quick Roll", systemImage: "plus") {
+                        editorRequest = EditorRequest(config: RollConfig(
+                            name: "",
+                            numberOfDice: quickRoll.numberOfDice,
+                            dieType: quickRoll.dieType,
+                            modifier: quickRoll.modifier
+                        ), isNew: true)
                     }
-                    .onDelete(perform: deleteConfig)
                 }
             }
-            
-            Button("Save Config") {
-                showingSaveAlert = true // Show the name input popup
+            .safeAreaInset(edge: .bottom) {
+                if let lastRoll {
+                    RollResultBanner(lastRoll: lastRoll) {
+                        roll(lastRoll.config, title: lastRoll.title)
+                    }
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
             }
-            .buttonStyle(.borderedProminent)
-            .alert("Save Roll Configuration", isPresented: $showingSaveAlert) {
-                TextField("Enter name", text: $newConfigName)
-                Button("Save", action: saveRollConfig) // Call function to save
-                Button("Cancel", role: .cancel) { newConfigName = "" }
-            } message: {
-                Text("Enter a name for this roll.")
+            .sheet(item: $editorRequest) { request in
+                RollConfigEditor(request: request)
             }
-            
-            Button("Reset", role: .destructive) {
-                reset()
-            }
-            .buttonStyle(.borderedProminent)
-
         }
-        .padding()
+    }
+
+    private func roll(_ config: RollConfig, title: String) {
+        withAnimation(.snappy) {
+            lastRoll = LastRoll(title: title, config: config, result: config.roll())
+        }
+    }
+
+    private func reset() {
+        withAnimation(.snappy) {
+            quickRoll = Self.defaultQuickRoll
+            lastRoll = nil
+        }
+    }
+}
+
+/// A saved roll in the list. Tapping it rolls immediately.
+struct SavedRollRow: View {
+    let config: RollConfig
+    let roll: () -> Void
+
+    var body: some View {
+        Button(action: roll) {
+            HStack {
+                VStack(alignment: .leading) {
+                    Text(config.name)
+                        .font(.headline)
+                    Text(config.notation)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Image(systemName: "dice")
+                    .foregroundStyle(.tint)
+            }
+            .contentShape(.rect)
+        }
+        .foregroundStyle(.primary)
+        .accessibilityHint("Rolls \(config.notation)")
     }
 }
 
 #Preview {
     ContentView()
-        .environment(RollStore())
+        .environment(RollStore.preview())
 }

@@ -28,7 +28,7 @@ final class PhoneSyncManager: NSObject, WCSessionDelegate {
         }
     }
 
-    private func send(_ configs: [String: RollConfig]) {
+    private func send(_ configs: [RollConfig]) {
         guard WCSession.isSupported() else { return }
         let session = WCSession.default
         guard session.activationState == .activated,
@@ -48,7 +48,7 @@ final class PhoneSyncManager: NSObject, WCSessionDelegate {
     }
 
     private func resendCurrentConfigs() {
-        send(store.savedConfigs)
+        send(store.configs)
     }
 
     // MARK: - WCSessionDelegate

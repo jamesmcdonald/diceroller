@@ -86,6 +86,32 @@ struct RollResultTests {
     }
 }
 
+struct RollConfigNotationTests {
+
+    @Test func notationIncludesSignedModifier() {
+        #expect(RollConfig(name: "", numberOfDice: 2, dieType: .d6, modifier: 0).notation == "2D6")
+        #expect(RollConfig(name: "", numberOfDice: 1, dieType: .d20, modifier: 5).notation == "1D20 + 5")
+        #expect(RollConfig(name: "", numberOfDice: 3, dieType: .d8, modifier: -2).notation == "3D8 - 2")
+    }
+
+    @Test func breakdownAbbreviatesLongRolls() {
+        let short = RollResult(dieType: .d6, rolls: [3, 5], modifier: 2)
+        #expect(short.breakdown == "2D6 [3 + 5] + 2")
+
+        let long = RollResult(dieType: .d6, rolls: Array(1...6) + Array(1...6), modifier: -1)
+        #expect(long.breakdown == "12D6 [1 + 2 + 3 + 4 + 5 ... 5 + 6] - 1")
+    }
+
+    @Test func decodesLegacyConfigWithoutID() throws {
+        let json = #"{"name":"Attack","numberOfDice":1,"dieType":20,"modifier":5}"#
+        let config = try JSONDecoder().decode(RollConfig.self, from: Data(json.utf8))
+
+        #expect(config.name == "Attack")
+        #expect(config.dieType == .d20)
+        #expect(config.modifier == 5)
+    }
+}
+
 @MainActor
 struct RollStoreTests {
     private let defaults: UserDefaults
@@ -96,45 +122,102 @@ struct RollStoreTests {
 
     private let attack = RollConfig(name: "Attack", numberOfDice: 1, dieType: .d20, modifier: 5)
     private let fireball = RollConfig(name: "Fireball", numberOfDice: 8, dieType: .d6, modifier: 0)
+    private let damage = RollConfig(name: "Damage", numberOfDice: 1, dieType: .d8, modifier: 3)
 
-    @Test func savedConfigsPersistAcrossInstances() {
+    @Test func configsPersistInOrderAcrossInstances() {
         let store = RollStore(defaults: defaults)
-        store.save(attack)
-        store.save(fireball)
+        store.add(fireball)
+        store.add(attack)
 
-        let reloaded = RollStore(defaults: defaults)
+        #expect(RollStore(defaults: defaults).configs == [fireball, attack])
+    }
 
-        #expect(reloaded.savedConfigs == ["Attack": attack, "Fireball": fireball])
-        #expect(reloaded.sortedNames == ["Attack", "Fireball"])
+    @Test func updateKeepsPositionAndIdentity() {
+        let store = RollStore(defaults: defaults)
+        store.add(attack)
+        store.add(fireball)
+
+        var renamed = attack
+        renamed.name = "Longsword"
+        store.update(renamed)
+
+        #expect(store.configs.map(\.name) == ["Longsword", "Fireball"])
+        #expect(store.configs.first?.id == attack.id)
+    }
+
+    @Test func moveReorders() {
+        let store = RollStore(defaults: defaults)
+        store.add(attack)
+        store.add(fireball)
+        store.add(damage)
+
+        store.move(fromOffsets: [2], toOffset: 0)
+
+        #expect(store.configs == [damage, attack, fireball])
+        #expect(RollStore(defaults: defaults).configs == [damage, attack, fireball])
     }
 
     @Test func deleteRemovesAndPersists() {
         let store = RollStore(defaults: defaults)
-        store.save(attack)
-        store.save(fireball)
+        store.add(attack)
+        store.add(fireball)
 
-        store.delete(names: ["Attack"])
+        store.delete(ids: [attack.id])
 
-        #expect(store.sortedNames == ["Fireball"])
-        #expect(RollStore(defaults: defaults).sortedNames == ["Fireball"])
+        #expect(store.configs == [fireball])
+        #expect(RollStore(defaults: defaults).configs == [fireball])
+    }
+
+    @Test func duplicateInsertsAfterOriginalWithUniqueName() {
+        let store = RollStore(defaults: defaults)
+        store.add(attack)
+        store.add(fireball)
+
+        let first = store.duplicate(attack)
+        let second = store.duplicate(attack)
+
+        #expect(store.configs.map(\.name) == ["Attack", "Attack 3", "Attack 2", "Fireball"])
+        #expect(first.id != attack.id)
+        #expect(second.id != first.id)
+        #expect(first.notation == attack.notation)
+    }
+
+    @Test func nameCheckIgnoresCaseSpacesAndSelf() {
+        let store = RollStore(defaults: defaults)
+        store.add(attack)
+
+        #expect(store.isNameTaken("  attack "))
+        #expect(!store.isNameTaken("Attack", excluding: attack.id))
+        #expect(!store.isNameTaken("Fireball"))
+    }
+
+    @Test func migratesLegacyDictionarySortedByName() throws {
+        let legacy = ["Fireball": fireball, "attack": attack, "Damage": damage]
+        defaults.set(try JSONEncoder().encode(legacy), forKey: RollStore.legacyStorageKey)
+
+        let store = RollStore(defaults: defaults)
+
+        #expect(store.configs.map(\.name) == ["Attack", "Damage", "Fireball"])
+        #expect(defaults.data(forKey: RollStore.legacyStorageKey) == nil)
+        #expect(RollStore(defaults: defaults).configs == store.configs)
     }
 
     @Test func localEditsNotifyButReplaceAllDoesNot() {
         let store = RollStore(defaults: defaults)
-        var notifications: [[String: RollConfig]] = []
+        var notifications: [[RollConfig]] = []
         store.onLocalChange = { notifications.append($0) }
 
-        store.save(attack)
-        store.delete(names: ["Attack"])
-        store.replaceAll(with: ["Fireball": fireball])
+        store.add(attack)
+        store.delete(ids: [attack.id])
+        store.replaceAll(with: [fireball])
 
-        #expect(notifications == [["Attack": attack], [:]])
-        #expect(store.savedConfigs == ["Fireball": fireball])
-        #expect(RollStore(defaults: defaults).savedConfigs == ["Fireball": fireball])
+        #expect(notifications == [[attack], []])
+        #expect(store.configs == [fireball])
+        #expect(RollStore(defaults: defaults).configs == [fireball])
     }
 
-    @Test func syncPayloadRoundTrips() throws {
-        let configs = ["Attack": attack, "Fireball": fireball]
+    @Test func syncPayloadRoundTripsInOrder() throws {
+        let configs = [fireball, attack, damage]
         let payload = try #require(SyncPayload.encode(configs))
 
         #expect(SyncPayload.decode(payload) == configs)

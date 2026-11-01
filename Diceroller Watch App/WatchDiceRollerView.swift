@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  WatchDiceRollerView.swift
 //  Diceroller Watch App
 //
 //  Created by James McDonald on 08/03/2025.
@@ -7,164 +7,153 @@
 
 import SwiftUI
 
+/// Screens pushed from the watch's root list, other than rolling a specific configuration.
+enum WatchRoute: Hashable {
+    case customRoll
+}
+
+/// The watch's first screen: saved rolls synced from the phone, plus a custom roll.
+/// Tapping a saved roll rolls it straight away.
 struct WatchDiceRollerView: View {
     @Environment(RollStore.self) private var store
 
-    @State private var numberOfDice: Int = 1
-    @State private var selectedDie: DieType = DieType.defaultDie
-    @State private var modifier: Int = 0
-    @State private var lastRoll: RollResult?
-    @State private var showingConfigSheet: Bool = false
-    @State private var showingSavedRolls: Bool = false
+    /// Kept here so the custom roll remembers its last settings while the app is running.
+    @State private var customRoll = RollConfig(name: "", numberOfDice: 1, dieType: .defaultDie, modifier: 0)
 
-    var modifierText: String {
-        modifier == 0 ? "" : (modifier > 0 ? "+" : "") + "\(modifier)"
+    var body: some View {
+        NavigationStack {
+            List {
+                NavigationLink(value: WatchRoute.customRoll) {
+                    Label("Custom Roll", systemImage: "slider.horizontal.3")
+                }
+
+                Section("Saved") {
+                    if store.configs.isEmpty {
+                        Text("Save rolls on your iPhone to see them here.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    ForEach(store.configs) { config in
+                        NavigationLink(value: config) {
+                            VStack(alignment: .leading) {
+                                Text(config.name)
+                                Text(config.notation)
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Diceroller")
+            .navigationDestination(for: RollConfig.self) { config in
+                WatchRollView(config: config)
+            }
+            .navigationDestination(for: WatchRoute.self) { route in
+                switch route {
+                case .customRoll:
+                    CustomRollView(config: $customRoll)
+                }
+            }
+        }
     }
+}
+
+/// Picks dice, die type, and modifier with three wheels that follow the Digital Crown.
+struct CustomRollView: View {
+    @Binding var config: RollConfig
+
     var body: some View {
         VStack {
-            HStack {
-                Button("\(numberOfDice)\(selectedDie.description)\(modifierText)") {
-                    showingConfigSheet = true
+            HStack(spacing: 2) {
+                Picker("Dice", selection: $config.numberOfDice) {
+                    ForEach(RollConfig.numberOfDiceRange, id: \.self) { count in
+                        Text("\(count)").tag(count)
+                    }
                 }
-                
-                Button("🎲") {
-                    lastRoll = RollConfig(name: "Default", numberOfDice: numberOfDice, dieType: selectedDie, modifier: modifier).roll()
-                    WKInterfaceDevice.current().play(.success)
+                Picker("Die", selection: $config.dieType) {
+                    ForEach(DieType.allCases, id: \.self) { die in
+                        Text(die.description).tag(die)
+                    }
                 }
-            }
-            Button("Saved") {
-                showingSavedRolls = true
-            }
-            .padding()
-            
-            .sheet(isPresented: $showingSavedRolls) {
-                List(store.sortedNames, id: \.self) { name in
-                    Button(name) {
-                        if let config = store.savedConfigs[name] {
-                            numberOfDice = config.numberOfDice
-                            selectedDie = config.dieType
-                            modifier = config.modifier
-                        }
-                        showingSavedRolls = false
+                Picker("Mod", selection: $config.modifier) {
+                    ForEach(RollConfig.modifierRange, id: \.self) { modifier in
+                        Text(modifier > 0 ? "+\(modifier)" : "\(modifier)").tag(modifier)
                     }
                 }
             }
+            .pickerStyle(.wheel)
 
-
-            Text(lastRoll.map { "\($0.total)" } ?? " ")
-            .font(.title)
+            NavigationLink(value: config) {
+                Label("Roll", systemImage: "dice")
+            }
+            .buttonStyle(.borderedProminent)
         }
-        .sheet(isPresented: $showingConfigSheet) {
-            DiceConfigView(
-                numberOfDice: $numberOfDice,
-                selectedDie: $selectedDie,
-                modifier: $modifier,
-                dismiss: { showingConfigSheet = false }
-            )
-        }
+        .navigationTitle(config.notation)
     }
 }
 
-struct DiceConfigView: View {
-    @Binding var numberOfDice: Int
-    @Binding var selectedDie: DieType
-    @Binding var modifier: Int
-    let dismiss: () -> Void
+/// Rolls a configuration as soon as it appears, with a button to roll again.
+struct WatchRollView: View {
+    let config: RollConfig
 
-    @State private var showingDicePicker = false
-    @State private var showingDiePicker = false
-    @State private var showingModifierPicker = false
+    @State private var result: RollResult?
+    @State private var rollCount = 0
+
+    private var totalColor: Color {
+        guard let result else { return .primary }
+        if result.isNaturalOne { return .red }
+        if result.isNaturalMax { return .green }
+        return .primary
+    }
 
     var body: some View {
-        List {
-            // Number of Dice (Tappable Row)
-            Button(action: { showingDicePicker = true }) {
-                HStack {
-                    Text("Number of Dice")
-                    Spacer()
-                    Text("\(numberOfDice)").foregroundColor(.gray)
-                }
+        VStack(spacing: 4) {
+            Text(result.map { "\($0.total)" } ?? " ")
+                .font(.system(size: 56, weight: .bold, design: .rounded))
+                .foregroundStyle(totalColor)
+                .contentTransition(.numericText())
+            Text(result?.breakdown ?? " ")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.7)
+            Spacer(minLength: 0)
+            Button("Roll Again", systemImage: "arrow.clockwise", action: roll)
+        }
+        .navigationTitle(config.name.isEmpty ? config.notation : config.name)
+        .sensoryFeedback(.success, trigger: rollCount)
+        .onAppear {
+            if result == nil {
+                roll()
             }
-            .sheet(isPresented: $showingDicePicker) {
-                SelectionView(
-                    title: "Select Number of Dice",
-                    options: Array(RollConfig.numberOfDiceRange),
-                    selected: $numberOfDice,
-                    format: { "\($0)"},
-                    dismiss: { showingDicePicker = false }
-                )
-            }
-
-            // Die Type (Tappable Row)
-            Button(action: { showingDiePicker = true }) {
-                HStack {
-                    Text("Die Type")
-                    Spacer()
-                    Text("\(selectedDie.description)").foregroundColor(.gray)
-                }
-            }
-            .sheet(isPresented: $showingDiePicker) {
-                SelectionView(
-                    title: "Select Die Type",
-                    options: DieType.allCases,
-                    selected: $selectedDie,
-                    format: { "\($0.description)" },
-                    dismiss: { showingDiePicker = false }
-                )
-            }
-
-            // Modifier (Tappable Row)
-            Button(action: { showingModifierPicker = true }) {
-                HStack {
-                    Text("Modifier")
-                    Spacer()
-                    Text("\(modifier >= 0 ? "+" : "")\(modifier)").foregroundColor(.gray)
-                }
-            }
-            .sheet(isPresented: $showingModifierPicker) {
-                SelectionView(
-                    title: "Select Modifier",
-                    options: Array(RollConfig.modifierRange),
-                    selected: $modifier,
-                    format: { "\($0 >= 0 ? "+" : "")\($0)" },
-                    dismiss: { showingModifierPicker = false }
-                )
-            }
-
-            Button("Done") { dismiss() }
-                .padding()
         }
     }
-}
 
-// 🔥 Reusable Selection Sheet
-struct SelectionView<T: Hashable>: View {
-    let title: String
-    let options: [T]
-    @Binding var selected: T
-    let format: (T) -> String
-    let dismiss: () -> Void
-
-    var body: some View {
-        List {
-            Text(title).font(.headline)
-            ForEach(options, id: \.self) { option in
-                Button(action: {
-                    selected = option
-                    dismiss()
-                }) {
-                    HStack {
-                        Text(format(option))
-                        Spacer()
-                        if option == selected { Image(systemName: "checkmark") }
-                    }
-                }
-            }
+    private func roll() {
+        withAnimation(.snappy) {
+            result = config.roll()
         }
+        rollCount += 1
     }
 }
 
 #Preview {
     WatchDiceRollerView()
-        .environment(RollStore())
+        .environment(RollStore.preview())
+}
+
+#Preview("Custom Roll") {
+    @Previewable @State var config = RollConfig(name: "", numberOfDice: 2, dieType: .d6, modifier: 3)
+    NavigationStack {
+        CustomRollView(config: $config)
+    }
+}
+
+#Preview("Roll Result") {
+    NavigationStack {
+        WatchRollView(config: RollConfig(name: "Fireball", numberOfDice: 8, dieType: .d6, modifier: 0))
+    }
 }

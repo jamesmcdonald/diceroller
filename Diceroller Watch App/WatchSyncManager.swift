@@ -23,7 +23,7 @@ final class WatchSyncManager: NSObject, WCSessionDelegate {
         }
     }
 
-    private func apply(_ configs: [String: RollConfig]) {
+    private func apply(_ configs: [RollConfig]) {
         store.replaceAll(with: configs)
     }
 
